@@ -38,7 +38,7 @@ public class Task2 extends Task {
         File input = new File(inFilename);
         Scanner scanner = new Scanner(input);
         n = scanner.nextInt();
-        m = scanner.nextInt();;
+        m = scanner.nextInt();
         k = scanner.nextInt();
         rel = new int[n + 1][n + 1];
 
@@ -126,12 +126,12 @@ public class Task2 extends Task {
                 sol.add(scanner.nextInt());
             }
         }
+
     }
 
     @Override
     public void writeAnswer() throws IOException {
         // TODO: write the answer to the current problem (outFilename)
-
         Writer wr = new FileWriter(outFilename);
         boolean flag = true;
         int crt = 0;
