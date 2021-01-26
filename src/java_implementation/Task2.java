@@ -1,5 +1,6 @@
-// Copyright 2020
-// Author: Matei Simtinică
+// Copyright 2021
+// Autor schelet: Matei Simtinică
+// Student: Maria Moșneag 323CA
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,11 +18,34 @@ import java.util.Scanner;
  * writeAnswer             - write the current problem's answer
  */
 public class Task2 extends Task {
-    // TODO: define necessary variables and/or data structures
-    private int n, m, k;
+    /**
+     * numărul de familii
+     */
+    private int n;
+    /**
+     * numărul de relații (de prietenie) între familii
+     */
+    private int m;
+    /**
+     * numărul de familii dintr-o familie extinsă căutată
+     */
+    private int k;
+
+    /**
+     * matricea de adiacență ce reprezintă graful familiilor
+     * rel[i][j] == 1 <=> Familia i și familia j se înțeleg.
+     */
     private int[][] rel;
+
+    /**
+     * răspunsul oracolului (True sau False)
+     */
     private String answer;
-    private ArrayList<Integer> sol = null;
+    /**
+     * răspunsul final al programului,
+     * reprezentat de lista de familii din familia extinsă găsită
+     */
+    private ArrayList<Integer> sol = new ArrayList<>();
 
     @Override
     public void solve() throws IOException, InterruptedException {
@@ -32,14 +56,18 @@ public class Task2 extends Task {
         writeAnswer();
     }
 
+    /**
+     * citirea datelor problemei de la input
+     */
     @Override
     public void readProblemData() throws IOException {
-        // TODO: read the problem input (inFilename) and store the data in the object's attributes
         File input = new File(inFilename);
         Scanner scanner = new Scanner(input);
+
         n = scanner.nextInt();
         m = scanner.nextInt();
         k = scanner.nextInt();
+
         rel = new int[n + 1][n + 1];
 
         for (int i = 1; i <= m; i++) {
@@ -50,19 +78,22 @@ public class Task2 extends Task {
         }
     }
 
+    /**
+     * crearea inputului pentru oracol,
+     * prin reducerea problemei curente la SAT
+     */
     @Override
     public void formulateOracleQuestion() throws IOException {
-        // TODO: transform the current problem into a SAT problem and write it (oracleInFilename) in a format
-        //  understood by the oracle
-
         Writer wr = new FileWriter(oracleInFilename);
 
+        // numărul de variabile din cadrul formulei în format cnf
         int V = n * k;
+        // numărul de clauze
         int F = n * (n - 1) / 2 * k + m * (k - 1) * k / 2 + n * (k - 1) * k / 2 + k;
 
         wr.write("p cnf " + V + " " + F + "\n");
 
-        // doua familii nu pot fi pe aceeasi pozitie din clica
+        // pe o poziție a clicii poate să fie cel mult o familie
         for (int i = 1; i < n; i++) {
             for (int j = i + 1; j <= n; j++) {
                 for (int l = 1; l <= k; l++) {
@@ -73,7 +104,16 @@ public class Task2 extends Task {
             }
         }
 
-        // doua familii care nu se inteleg nu pot face parte din aceeasi familie extinsa
+        // pe o poziție a clicii trebuie să fie cel puțin o familie
+        for (int i = 1; i <= k; i++) {
+            for (int j = 1; j <= n; j++) {
+                int var = (j - 1) * k + i;
+                wr.write(var + " ");
+            }
+            wr.write(" 0\n");
+        }
+
+        // două familii care nu se înteleg nu pot face parte din aceeași familie extinsă
         for (int i = 1; i < n; i++) {
             for (int j = i + 1; j <= n; j++) {
                 if (rel[i][j] != 1) {
@@ -88,7 +128,7 @@ public class Task2 extends Task {
             }
         }
 
-        // o familie nu poate sa apara pe mai multe pozitii ale clicii
+        // o familie nu poate să apară pe mai multe poziții ale clicii
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j < k; j++) {
                 for (int l = j + 1; l <= k; l++) {
@@ -99,54 +139,48 @@ public class Task2 extends Task {
             }
         }
 
-        // pe o pozitie a clicii trebuie sa fie cel putin o familie
-        for (int i = 1; i <= k; i++) {
-            for (int j = 1; j <= n; j++) {
-                int var = (j - 1) * k + i;
-                wr.write(var + " ");
-            }
-            wr.write(" 0\n");
-        }
-
         wr.close();
     }
 
+    /**
+     * decodificarea răspunsului primit de la oracol
+     */
     @Override
     public void decipherOracleAnswer() throws IOException {
-        // TODO: extract the current problem's answer from the answer given by the oracle (oracleOutFilename)
-
         File input = new File(oracleOutFilename);
         Scanner scanner = new Scanner(input);
+        boolean flag = true;
+        int crt = 0;
 
         answer = scanner.next();
         if (answer.equals("True")) {
             int V = scanner.nextInt();
-            sol = new ArrayList<>();
-            for (int i = 1; i <= V; i++) {
-                sol.add(scanner.nextInt());
+            for (int i = 1; i <= V; i += k) {
+                crt++;
+                for (int j = 1; j <= k; j++) {
+                    int crtVar = scanner.nextInt();
+                    if (crtVar > 0) {
+                        sol.add(crt);
+                    }
+                }
             }
         }
 
     }
 
+    /**
+     * scrierea răspunsului final în fișierul de output
+     */
     @Override
     public void writeAnswer() throws IOException {
-        // TODO: write the answer to the current problem (outFilename)
         Writer wr = new FileWriter(outFilename);
-        boolean flag = true;
-        int crt = 0;
         wr.write(answer + "\n");
         if (answer.equals("True")) {
-            for (int i = 0; i < sol.size(); i += k) {
-                crt++;
-                flag = true;
-                for (int j = 0; j < k && flag; j++) {
-                    if (sol.get(i + j) > 0) {
-                        wr.write(crt + " ");
-                        flag = false;
-                    }
-                }
+            for (Integer i :
+                    sol) {
+                wr.write(i + " ");
             }
+            wr.write("\n");
         }
         wr.close();
     }

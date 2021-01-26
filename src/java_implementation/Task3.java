@@ -1,5 +1,6 @@
-// Copyright 2020
-// Author: Matei Simtinică
+// Copyright 2021
+// Autor schelet: Matei Simtinică
+// Student: Maria Moșneag 323CA
 
 import java.io.*;
 import java.util.ArrayList;
