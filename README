@@ -1,0 +1,115 @@
+Maria Moșneag 323CA
+
+Task 1
+
+	Pentru rezolvarea acestui task am redus problema la SAT urmând modelul
+reducerii problemei k-Colorare la SAT.
+	Am ales variabilele astfel încât să reprezinte posibilii spioni care să se
+infiltreze în fiecare familie, fiecare familie având așadar câte k variabile
+corespunzătoare; variabila (i - 1) * k + j este 1 dacă, pentru cazul în care
+avem k spioni disponibili, spionul asignat familiei i este j și 0 altfel.
+	Pentru clauze există trei tipuri, în funcție de condițiile pe care acestea
+le asigură:
+	- o familie trebuie să aibă cel puțin un spion infiltrat (n clauze cu câte
+k variabile);
+	- o familie poate avea cel mult un spion infiltrat (n * (k - 1) * k / 2
+clauze cu câte 2 variabile);
+	- același spion nu poate fi asignat unor familii care se înțeleg (m clauze
+cu câte 2 variabile).
+	Pentru a descifra răspunsul oracolului, parcurg valorile întoarse în grupuri
+de câte k variabile dintre care numai una va fi pozitivă, aceasta reprezentând
+spionul ales pentru familia curentă.
+	Complexitatea reducerii problemei la SAT este reprezentată de complexitatea
+construirii clauzelor. Astfel, pentru primul tip de clauze complexitatea este
+O(n*k), pentru cel de-al doilea O(n*k^2), iar pentru cel de-al treilea
+O(n^2+m*k), unde n reprezintă numărul de familii, m numărul relațiilor dintre
+familii, iar k numărul de spioni. În cel mai defavorabil caz, k = n, iar
+m = (n-1)*n/2, complexitatea totală va fi O(n^2 + n^3 + n^3), adică O(n^3),
+deci reducerea se va face în timp polinomial.
+	Descifrarea răspunsului oracolului se face în O(V*k), V fiind egal cu
+numărul total de variabile, deci n*k, așadar com avea O(n*k*k). În cazul cel mai
+defavorabil, așa cum este menționat și anterior, k = n, deci complexitatea va fi
+tot O(n^3). 
+
+Task 2
+	
+	Pentru rezolvarea acestui task am redus problema la SAT urmând modelul
+reducerii problemei k-Clicii la SAT. Pentru aceasta, am considerat că, în cadrul
+unei familii extinse, fiecare familie membru are o poziție (sau un număr de
+ordine).
+	Am ales variabilele astfel încât să reprezinte ce familie se află pe o
+anumită poziție a familiei extinse: variabila (i - 1) * k + j este 1 dacă, în
+cazul în care căutăm o familie extinsă cu k membrii, familia i se află pe
+poziția j și 0 altfel.
+	Pentru clauze am format patru tipuri, în funcție de condițiile pe care le
+asigură:
+	- pe o poziție a familiei extinse poate să fie cel mult o familie
+((n - 1) * n / 2 * k clauze cu câte două variabile);
+	- pe o poziție a familiei trebuie să fie cel puțin o familie (k clauze cu
+câte n variabile);
+	- două familii care nu se înțeleg nu pot face parte din aceeași familie
+extinsă (m * k * k clauze cu câte 2 variabile);
+	- o familie nu poate să apară pe mai multe poziții ale familiei extinse
+(n * (k - 1) * k / 2 clauze cu câte 2 variabile).
+	Pentru a descifra răspunsul oracolului, parcurg valorile rezultate în
+grupuri de câte k. În cadrul unui grup, cel mult o variabilă poate avea valoare
+pozitivă; în cazul în care parcurgem cel de-al x-lea grup și cea de-a y-a
+variabilă este poitivă, înseamnă că familia curentă (x) se găsește în familia
+extinsă pe poziția y, deci o adaug la lista finală cu membrii ai familiei
+extinse căutate.
+	Complexitatea reducerii la SAT este reprezentată și în acest caz de
+complexitatea construirii clauzelor. Pentru primul set de clauze avem
+O((n-1)*n/2*k), adică O(n^2*k), pentru al doilea O(k*n), pentru al treilea
+O((n-1)*n/2+m*k^2), adică O(n^2+m*k^2), iar pentru al patrulea O(n*(k-1)*k/2),
+adică O(n*k^2), unde n reprezintă numărul de familii, m numărul relațiilor
+dintre familii, iar k numărul de familii din familia extinsă căutată. În cel mai
+defavorabil caz, k = n, iar m = (n-1)*n/2, complexitatea va fi
+O(n^3 + n^2 + n^4 + n^3), adică O(n^4), deci reducerea se va face în timp
+polinomial.
+	Descifrarea răspunsului oracolului se face în O(V*k), unde V este numărul de
+variabile, adică n*k, iar k = n în cel mai defavorbil caz, deci complexitatea va
+fi O(n^3).
+
+Task 3
+	
+	Pentru a rezolva acest task, am construit o matrice complementară de
+adiacență și pe baza acesteia, folosindu-mă de task-ul 2, am căutat cea mai mare
+clică, reprezentând grupul de familii care pot să nu fie arestate pentru că nu
+se înțeleg. Pentru aceasta, am apelat la rezolvarea task-ului 2 pentru
+dimensiuni ale clicii de la n la 1, oprindu-mă în momentul în care descopeream
+o clică de familii neprietenoase. Pentru a reduce o parte a problemei curente la
+task-ul 2, n rămâne neschimbat (numărul de familii nu se modifică), m devine
+(n-1)*n/2-m (numărul de "relații de neînțelegere"), k ia valoarea curentă
+(cuprinsă între n și 1) a dimensiunii grupului de familii care să nu fie
+arestate, iar cele m relații sunt construite pe baza matricii complementare.
+	Pentru decodificarea răspunsului primit de la task-ul 2, dacă acesta este
+True, parcurgem lista de valori ce reprezintă familiile care nu vor fi arestate
+și, pe baza acesteia, construim lista complementară (de familii care urmează să
+fie arestate).
+	Complexitatea reducerii la task-ul 2 este O((n-1)*n/2), adică O(n^2),
+rezolvarea task-ului 2 este, după cum am arătat mai sus, O(n^4), iar
+decodificarea răspunsului primit se face în O(n). Așadar, pentru o dimensiune a
+grupului de arestări, complexitatea este O(n^4), iar în cel mai defavorabil caz
+trebuie să încercăm toate dimensiunile (de la n la 1), deci complexitatea totală
+va fi O(n^5), deci reducerea se va face în timp polinomial.
+
+Bonus
+
+	Pentru acest task, am ales variabilele astfel încât să reprezinte dacă o
+familie este arestată sau nu; variabila i este 1 dacă familia i trebuie să fie
+arestată și 0 altfel.
+	Pentru reducerea la SAT, am construit două tipuri de clauze, în funcție de
+condiția pe care o asigură:
+	- dintre două familii ce se înțeleg, cel puțin una trebuie arestată (m
+clauze hard);
+	- cât mai puține familii trebuie să fie arestate (n clauze soft, cu pondere
+1).
+	Descifrarea răspunsului primit de la oracol presupune parcurgerea valorilor
+și memorarea valorilor pozitive, acestea reprezentând familiile ce urmează să
+fie arestate.
+	Complexitatea reducerii este O((n-1)*n/2), adică O(n^2) pentru primul set de
+clauze și O(n) pentru cel de-al doilea, deci O(n^2) per total, unde n reprezintă
+numărul de familii.
+	Decodificarea răspunsului oracolului are complexitate O(var), unde var
+reprezintă numărul de variabile, adică n, deci avem O(n).
+	Reducerea la SAT se face așadar în timp polinomial.

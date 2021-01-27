@@ -4,24 +4,50 @@
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-/**
- * Task3
- * This being an optimization problem, the solve method's logic has to work differently.
- * You have to search for the minimum number of arrests by successively querying the oracle.
- * Hint: it might be easier to reduce the current task to a previously solved task
- */
 public class Task3 extends Task {
     String task2InFilename;
     String task2OutFilename;
-    // TODO: define necessary variables and/or data structures
-    private int n, m;
+
+    /**
+     * numărul de familii
+     */
+    private int n;
+    /**
+     * numărul de relații (de prietenie) între familii
+     */
+    private int m;
+    /**
+     * matricea de adiacență ce reprezintă graful familiilor
+     * rel[i][j] == 1 <=> Familia i și familia j se înțeleg.
+     */
     private int[][] rel;
+    /**
+     * matricea de adiacență complementară
+     * rel[i][j] == 1 <=> Familiile i și j nu se înțeleg.
+     */
     private int[][] complAdjMatrix;
-    private int crtK, complM = 0;
-    private String crtAns = new String("False");
-    private ArrayList<Integer> antisocialFamilies;
+    /**
+     * numărul "relațiilor de neînțelegere"
+     */
+    private int complM = 0;
+    /**
+     * dimensiunea curentă a clicii căutate
+     */
+    private int crtK;
+    /**
+     * răspunsul ultimei interogări a oracolului
+     */
+    private String crtAns = "False";
+    /**
+     * lista cu familiile care nu vor fi arestate
+     */
+    private final ArrayList<Integer> antisocialFamilies = new ArrayList<>();
+
+    /**
+     * lista cu familiile care vor fi arestate
+     */
+    private final ArrayList<Integer> sol = new ArrayList<>();
 
     @Override
     public void solve() throws IOException, InterruptedException {
@@ -31,8 +57,6 @@ public class Task3 extends Task {
         task2Solver.addFiles(task2InFilename, oracleInFilename, oracleOutFilename, task2OutFilename);
         readProblemData();
 
-        // TODO: implement a way of successively querying the oracle (using Task2) about various arrest numbers until you
-        //  find the minimum
         for (int i = n; i >= 1 && crtAns.equals("False"); i--) {
             crtK = i;
             reduceToTask2();
@@ -43,29 +67,34 @@ public class Task3 extends Task {
         writeAnswer();
     }
 
+    /**
+     * citirea datelor problemei de la input
+     */
     @Override
     public void readProblemData() throws IOException {
-        // TODO: read the problem input (inFilename) and store the data in the object's attributes
-        File input = new File(inFilename);
-        Scanner scanner = new Scanner(input);
-        n = scanner.nextInt();
-        m = scanner.nextInt();
+        BufferedReader reader = new BufferedReader(new FileReader(inFilename));
+
+        String[] nums = reader.readLine().trim().split("\\s+");
+        n = Integer.parseInt(nums[0]);
+        m = Integer.parseInt(nums[1]);
+
         rel = new int[n + 1][n + 1];
 
         for (int i = 1; i <= m; i++) {
-            int u = scanner.nextInt();
-            int v = scanner.nextInt();
+            String[] nums2 = reader.readLine().trim().split("\\s+");
+            int u = Integer.parseInt(nums2[0]);
+            int v = Integer.parseInt(nums2[1]);
             rel[u][v] = 1;
             rel[v][u] = 1;
         }
-        createComplementaryAdjMatrix();
 
-        int mMax = (n - 1) * n / 2;
-        complM = mMax - m;
+        createComplementaryAdjMatrix();
     }
 
+    /**
+     * reducerea problemei curente la task-ul 2 și crearea input-ului pentru acesta
+     */
     public void reduceToTask2() throws IOException {
-        // TODO: reduce the current problem to Task2
         Writer wr = new FileWriter(task2InFilename);
 
         wr.write(n + " ");
@@ -83,36 +112,49 @@ public class Task3 extends Task {
         wr.close();
     }
 
-    public void extractAnswerFromTask2() throws FileNotFoundException {
-        // TODO: extract the current problem's answer from Task2's answer
-        File task2Ans = new File(task2OutFilename);
-        Scanner scanner = new Scanner(task2Ans);
+    /**
+     * decodificarea răspunsului primit de la task2
+     */
+    public void extractAnswerFromTask2() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(task2OutFilename));
 
-        crtAns = scanner.next();
+        crtAns = reader.readLine();
         if (crtAns.equals("True")) {
-            antisocialFamilies = new ArrayList<>();
-            while (scanner.hasNext()) {
-                antisocialFamilies.add(scanner.nextInt());
+            // obținerea listei de familii care nu vor fi arestate
+            String[] nums = reader.readLine().trim().split("\\s+");
+            for (String s:
+                 nums) {
+                antisocialFamilies.add(Integer.parseInt(s));
+            }
+
+            // crearea listei de familii ce urmează să fie arestate
+            for (int i = 1; i <= n; i++) {
+                if (!antisocialFamilies.contains(i)) {
+                    sol.add(i);
+                }
             }
         }
     }
 
+    /**
+     * scrierea răspunsului final în fișierul de output
+     */
     @Override
     public void writeAnswer() throws IOException {
-        // TODO: write the answer to the current problem (outFilename)
-
         Writer wr = new FileWriter(outFilename);
 
-        for (int i = 1; i <= n; i++) {
-            if (!antisocialFamilies.contains(i)) {
-                wr.write(i + " ");
-            }
+        for (Integer i :
+                sol) {
+            wr.write(i + " ");
         }
         wr.write("\n");
 
         wr.close();
     }
 
+    /**
+     * construirea matricii complementare de adiacență
+     */
     private void createComplementaryAdjMatrix() {
         complAdjMatrix = new int[n + 1][n + 1];
         for (int i = 1; i <= n; i++) {
@@ -124,5 +166,8 @@ public class Task3 extends Task {
                 }
             }
         }
+
+        int mMax = (n - 1) * n / 2;
+        complM = mMax - m;
     }
 }

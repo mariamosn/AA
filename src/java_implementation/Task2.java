@@ -2,21 +2,9 @@
 // Autor schelet: Matei Simtinică
 // Student: Maria Moșneag 323CA
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-/**
- * Task2
- * You have to implement 4 methods:
- * readProblemData         - read the problem input and store it however you see fit
- * formulateOracleQuestion - transform the current problem instance into a SAT instance and write the oracle input
- * decipherOracleAnswer    - transform the SAT answer back to the current problem's answer
- * writeAnswer             - write the current problem's answer
- */
 public class Task2 extends Task {
     /**
      * numărul de familii
@@ -45,7 +33,7 @@ public class Task2 extends Task {
      * răspunsul final al programului,
      * reprezentat de lista de familii din familia extinsă găsită
      */
-    private ArrayList<Integer> sol = new ArrayList<>();
+    private final ArrayList<Integer> sol = new ArrayList<>();
 
     @Override
     public void solve() throws IOException, InterruptedException {
@@ -61,26 +49,26 @@ public class Task2 extends Task {
      */
     @Override
     public void readProblemData() throws IOException {
-        File input = new File(inFilename);
-        Scanner scanner = new Scanner(input);
+        BufferedReader reader = new BufferedReader(new FileReader(inFilename));
 
-        n = scanner.nextInt();
-        m = scanner.nextInt();
-        k = scanner.nextInt();
+        String[] nums = reader.readLine().trim().split("\\s+");
+        n = Integer.parseInt(nums[0]);
+        m = Integer.parseInt(nums[1]);
+        k = Integer.parseInt(nums[2]);
 
         rel = new int[n + 1][n + 1];
 
         for (int i = 1; i <= m; i++) {
-            int u = scanner.nextInt();
-            int v = scanner.nextInt();
+            String[] nums2 = reader.readLine().trim().split("\\s+");
+            int u = Integer.parseInt(nums2[0]);
+            int v = Integer.parseInt(nums2[1]);
             rel[u][v] = 1;
             rel[v][u] = 1;
         }
     }
 
     /**
-     * crearea inputului pentru oracol,
-     * prin reducerea problemei curente la SAT
+     * crearea inputului pentru oracol, prin reducerea problemei curente la SAT
      */
     @Override
     public void formulateOracleQuestion() throws IOException {
@@ -89,8 +77,7 @@ public class Task2 extends Task {
         // numărul de variabile din cadrul formulei în format cnf
         int V = n * k;
         // numărul de clauze
-        int F = n * (n - 1) / 2 * k + m * (k - 1) * k / 2 + n * (k - 1) * k / 2 + k;
-
+        int F = n * (n - 1) / 2 * k + k + m * k * k + n * (k - 1) * k / 2;
         wr.write("p cnf " + V + " " + F + "\n");
 
         // pe o poziție a clicii poate să fie cel mult o familie
@@ -147,25 +134,27 @@ public class Task2 extends Task {
      */
     @Override
     public void decipherOracleAnswer() throws IOException {
-        File input = new File(oracleOutFilename);
-        Scanner scanner = new Scanner(input);
-        boolean flag = true;
+        BufferedReader reader = new BufferedReader(new FileReader(oracleOutFilename));
         int crt = 0;
+        boolean flag;
 
-        answer = scanner.next();
+        answer = reader.readLine();
         if (answer.equals("True")) {
-            int V = scanner.nextInt();
+            int V = Integer.parseInt(reader.readLine());
+
+            String[] nums = reader.readLine().trim().split("\\s+");
             for (int i = 1; i <= V; i += k) {
                 crt++;
-                for (int j = 1; j <= k; j++) {
-                    int crtVar = scanner.nextInt();
+                flag = true;
+                for (int j = 1; j <= k && flag; j++) {
+                    int crtVar = Integer.parseInt(nums[(i - 1) + (j - 1)]);
                     if (crtVar > 0) {
                         sol.add(crt);
+                        flag = false;
                     }
                 }
             }
         }
-
     }
 
     /**

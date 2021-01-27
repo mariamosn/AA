@@ -2,13 +2,8 @@
 // Autor schelet: Matei Simtinică
 // Student: Maria Moșneag 323CA
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
 
 public class Task1 extends Task {
     /**
@@ -23,7 +18,6 @@ public class Task1 extends Task {
      * numărul de spioni disponibili
      */
     private int k;
-
     /**
      * matricea de adiacență ce reprezintă graful familiilor
      * rel[i][j] == 1 <=> Familia i și familia j se înțeleg.
@@ -38,7 +32,7 @@ public class Task1 extends Task {
      * răspunsul final al programului,
      * reprezentat de lista de spioni asignați fiecărei familii
      */
-    private ArrayList<Integer> sol = new ArrayList<>();
+    private final ArrayList<Integer> sol = new ArrayList<>();
 
     @Override
     public void solve() throws IOException, InterruptedException {
@@ -54,26 +48,25 @@ public class Task1 extends Task {
      */
     @Override
     public void readProblemData() throws IOException {
-        File input = new File(inFilename);
-        Scanner scanner = new Scanner(input);
-
-        n = scanner.nextInt();
-        m = scanner.nextInt();
-        k = scanner.nextInt();
+        BufferedReader reader = new BufferedReader(new FileReader(inFilename));
+        String[] nums = reader.readLine().trim().split("\\s+");
+        n = Integer.parseInt(nums[0]);
+        m = Integer.parseInt(nums[1]);
+        k = Integer.parseInt(nums[2]);
 
         rel = new int[n + 1][n + 1];
 
         for (int i = 1; i <= m; i++) {
-            int u = scanner.nextInt();
-            int v = scanner.nextInt();
+            String[] nums2 = reader.readLine().trim().split("\\s+");
+            int u = Integer.parseInt(nums2[0]);
+            int v = Integer.parseInt(nums2[1]);
             rel[u][v] = 1;
             rel[v][u] = 1;
         }
     }
 
     /**
-     * crearea inputului pentru oracol,
-     * prin reducerea problemei curente la SAT
+     * crearea inputului pentru oracol, prin reducerea problemei curente la SAT
      */
     @Override
     public void formulateOracleQuestion() throws IOException {
@@ -126,22 +119,24 @@ public class Task1 extends Task {
      */
     @Override
     public void decipherOracleAnswer() throws IOException {
-        File input = new File(oracleOutFilename);
-        Scanner scanner = new Scanner(input);
-
-        answer = scanner.next();
+        BufferedReader reader = new BufferedReader(new FileReader(oracleOutFilename));
+        boolean flag;
+        answer = reader.readLine();
         if (answer.equals("True")) {
-            int V = scanner.nextInt();
+            int V = Integer.parseInt(reader.readLine());
+
+            String[] nums = reader.readLine().trim().split("\\s+");
             for (int i = 1; i <= V; i += k) {
-                for (int j = 1; j <= k; j++) {
-                    int crt = scanner.nextInt();
+                flag = true;
+                for (int j = 1; j <= k && flag; j++) {
+                    int crt = Integer.parseInt(nums[(i - 1) + (j - 1)]);
                     if (crt > 0) {
                         sol.add(j);
+                        flag = false;
                     }
                 }
             }
         }
-
     }
 
     /**

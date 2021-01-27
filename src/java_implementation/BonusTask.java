@@ -2,26 +2,28 @@
 // Autor schelet: Matei Simtinică
 // Student: Maria Moșneag 323CA
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-/**
- * Bonus Task
- * You have to implement 4 methods:
- * readProblemData         - read the problem input and store it however you see fit
- * formulateOracleQuestion - transform the current problem instance into a SAT instance and write the oracle input
- * decipherOracleAnswer    - transform the SAT answer back to the current problem's answer
- * writeAnswer             - write the current problem's answer
- */
 public class BonusTask extends Task {
-    // TODO: define necessary variables and/or data structures
-    private int n, m;
+    /**
+     * numărul de familii
+     */
+    private int n;
+    /**
+     * numărul de relații (de prietenie) între familii
+     */
+    private int m;
+    /**
+     * matricea de adiacență ce reprezintă graful familiilor
+     * rel[i][j] == 1 <=> Familia i și familia j se înțeleg.
+     */
     private int[][] rel;
-    private ArrayList<Integer> sol = new ArrayList<>();
+
+    /**
+     * lista cu familiile care vor fi arestate
+     */
+    private final ArrayList<Integer> sol = new ArrayList<>();
 
     @Override
     public void solve() throws IOException, InterruptedException {
@@ -34,16 +36,18 @@ public class BonusTask extends Task {
 
     @Override
     public void readProblemData() throws IOException {
-        // TODO: read the problem input (inFilename) and store the data in the object's attributes
-        File input = new File(inFilename);
-        Scanner scanner = new Scanner(input);
-        n = scanner.nextInt();
-        m = scanner.nextInt();
+        BufferedReader reader = new BufferedReader(new FileReader(inFilename));
+
+        String[] nums = reader.readLine().trim().split("\\s+");
+        n = Integer.parseInt(nums[0]);
+        m = Integer.parseInt(nums[1]);
+
         rel = new int[n + 1][n + 1];
 
         for (int i = 1; i <= m; i++) {
-            int u = scanner.nextInt();
-            int v = scanner.nextInt();
+            String[] nums2 = reader.readLine().trim().split("\\s+");
+            int u = Integer.parseInt(nums2[0]);
+            int v = Integer.parseInt(nums2[1]);
             rel[u][v] = 1;
             rel[v][u] = 1;
         }
@@ -51,18 +55,18 @@ public class BonusTask extends Task {
 
     @Override
     public void formulateOracleQuestion() throws IOException {
-        // TODO: transform the current problem into a SAT problem and write it (oracleInFilename) in a format
-        //  understood by the oracle
-
         Writer wr = new FileWriter(oracleInFilename);
 
+        // numărul de variabile din cadrul formulei în format cnf
         int V = n;
+        // numărul de clauze
         int F = m + n;
+        // suma ponderilor clauzelor soft
         int S = n;
 
         wr.write("p wcnf " + V + " " + F + " " + (S + 1) + "\n");
 
-        // dacă două familii se înțeleg, cel puțin una trebuie să fie arestată
+        // dacă două familii se înțeleg, cel puțin una trebuie să fie arestată (clauze hard)
         for (int i = 1; i < n; i++) {
             for (int j = i + 1; j <= n; j++) {
                 if (rel[i][j] == 1) {
@@ -71,7 +75,7 @@ public class BonusTask extends Task {
             }
         }
 
-        // dorim să arestăm cât mai puține familii
+        // dorim să arestăm cât mai puține familii (clauze soft)
         for (int i = 1; i <= n; i++) {
             wr.write(1 + " " + -i + " 0\n");
         }
@@ -79,35 +83,38 @@ public class BonusTask extends Task {
         wr.close();
     }
 
+    /**
+     * decodificarea răspunsului primit de la oracol
+     */
     @Override
     public void decipherOracleAnswer() throws IOException {
-        // TODO: extract the current problem's answer from the answer given by the oracle (oracleOutFilename)
+        BufferedReader reader = new BufferedReader(new FileReader(oracleOutFilename));
 
-        File input = new File(oracleOutFilename);
-        Scanner scanner = new Scanner(input);
+        String[] nums = reader.readLine().trim().split("\\s+");
+        int var = Integer.parseInt(nums[0]);
 
-        int var = scanner.nextInt();
-        int vals = scanner.nextInt();
+        String[] nums2 = reader.readLine().trim().split("\\s+");
         for (int i = 1; i <= var; i++) {
-            int crtFam = scanner.nextInt();
+            int crtFam = Integer.parseInt(nums2[i - 1]);
             if (crtFam > 0) {
                 sol.add(crtFam);
             }
         }
     }
 
+    /**
+     * scrierea răspunsului final în fișierul de output
+     */
     @Override
     public void writeAnswer() throws IOException {
-        // TODO: write the answer to the current problem (outFilename)
-
         Writer wr = new FileWriter(outFilename);
-        if (sol != null) {
-            for (Integer i :
-                    sol) {
-                wr.write(i + " ");
-            }
+
+        for (Integer i :
+                sol) {
+            wr.write(i + " ");
         }
         wr.write("\n");
+
         wr.close();
     }
 }
