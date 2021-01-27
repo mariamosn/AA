@@ -65,6 +65,8 @@ public class Task2 extends Task {
             rel[u][v] = 1;
             rel[v][u] = 1;
         }
+
+        reader.close();
     }
 
     /**
@@ -155,6 +157,8 @@ public class Task2 extends Task {
                 }
             }
         }
+
+        reader.close();
     }
 
     /**

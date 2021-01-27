@@ -51,6 +51,8 @@ public class BonusTask extends Task {
             rel[u][v] = 1;
             rel[v][u] = 1;
         }
+
+        reader.close();
     }
 
     @Override
@@ -100,6 +102,8 @@ public class BonusTask extends Task {
                 sol.add(crtFam);
             }
         }
+
+        reader.close();
     }
 
     /**

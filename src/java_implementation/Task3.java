@@ -89,6 +89,8 @@ public class Task3 extends Task {
         }
 
         createComplementaryAdjMatrix();
+
+        reader.close();
     }
 
     /**
@@ -134,6 +136,8 @@ public class Task3 extends Task {
                 }
             }
         }
+
+        reader.close();
     }
 
     /**

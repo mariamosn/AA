@@ -26,10 +26,10 @@ O(n^2+m*k), unde n reprezintă numărul de familii, m numărul relațiilor dintr
 familii, iar k numărul de spioni. În cel mai defavorabil caz, k = n, iar
 m = (n-1)*n/2, complexitatea totală va fi O(n^2 + n^3 + n^3), adică O(n^3),
 deci reducerea se va face în timp polinomial.
-	Descifrarea răspunsului oracolului se face în O(V*k), V fiind egal cu
-numărul total de variabile, deci n*k, așadar com avea O(n*k*k). În cazul cel mai
+	Descifrarea răspunsului oracolului se face în O(V/k*k), V fiind egal cu
+numărul total de variabile, deci n*k, așadar com avea O(n*k). În cazul cel mai
 defavorabil, așa cum este menționat și anterior, k = n, deci complexitatea va fi
-tot O(n^3). 
+tot O(n^2). 
 
 Task 2
 	
@@ -66,9 +66,9 @@ dintre familii, iar k numărul de familii din familia extinsă căutată. În ce
 defavorabil caz, k = n, iar m = (n-1)*n/2, complexitatea va fi
 O(n^3 + n^2 + n^4 + n^3), adică O(n^4), deci reducerea se va face în timp
 polinomial.
-	Descifrarea răspunsului oracolului se face în O(V*k), unde V este numărul de
+	Descifrarea răspunsului oracolului se face în O(V/k*k), unde V este numărul de
 variabile, adică n*k, iar k = n în cel mai defavorbil caz, deci complexitatea va
-fi O(n^3).
+fi O(n^2).
 
 Task 3
 	
